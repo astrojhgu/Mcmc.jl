@@ -1,7 +1,8 @@
 module Mcmc
-include("utils.jl")
-include("ptsample.jl")
-include("ensemble.jl")
+
+include("Utils.jl")
+include("Pt.jl")
+include("Ensemble.jl")
 
 
 end # module

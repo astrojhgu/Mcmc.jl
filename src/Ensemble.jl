@@ -1,7 +1,7 @@
-module ensemble
+module Ensemble
 
-include("utils.jl")
-const draw_z = utils.draw_z
+using ..Utils
+const draw_z = Utils.draw_z
 
 using Random
 

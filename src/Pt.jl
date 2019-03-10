@@ -1,10 +1,9 @@
-module ptsample
-include("utils.jl")
+module Pt
 
-const draw_z = utils.draw_z
-
+using ..Utils
 using Random
 
+const draw_z=Utils.draw_z
 
 function pt_only_sample(logprob::Function, 
     ensemble::Array{Array{T,1},1}, 

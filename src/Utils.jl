@@ -1,4 +1,4 @@
-module utils
+module Utils
 using Random
 
 function draw_z(a::T, rng::R) where

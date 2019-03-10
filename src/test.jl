@@ -1,4 +1,4 @@
-include("mcmc.jl")
+include("Mcmc.jl")
 
 using Random
 import SpecialFunctions
@@ -70,13 +70,13 @@ Plots.pyplot()
 hist=empty([], Array{Float64, 1})
 
 for i in 1:1000
-    ensemble, lp=mcmc.ptsample.sample(logprob, ensemble, lp, beta_list, true, 0.5)
+    ensemble, lp=Mcmc.Pt.sample(logprob, ensemble, lp, beta_list, i%10==0, 0.5)
     #push!(hist, ensemble[1])
 end
 
 
 for i in 1:30000
-    ensemble, lp=mcmc.ptsample.sample(logprob, ensemble, lp, beta_list, true, 0.5)
+    ensemble, lp=Mcmc.Pt.sample(logprob, ensemble, lp, beta_list, i%10==0, 0.5)
     push!(hist, ensemble[1])
 end
 
