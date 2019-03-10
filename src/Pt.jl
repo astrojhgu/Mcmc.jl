@@ -1,10 +1,9 @@
 module Pt
-include("utils.jl")
 
-const draw_z = utils.draw_z
-
+using ..Utils
 using Random
 
+const draw_z=Utils.draw_z
 
 function pt_only_sample(logprob::Function, 
     ensemble::Array{Array{T,1},1}, 
@@ -41,7 +40,8 @@ function pt_only_sample(logprob::Function,
 
     lp_cached = length(lp_cache)==length(ensemble)
     if !lp_cached
-        lp_cache = resize!(lp_cache, length(ensemble))
+        resize!(lp_cache, nwalkers*nbetas)
+        #lp_cache = fill(zero(T), nwalkers * nbetas)
         for i in 1:nwalkers * nbetas
             lp_cache[i] = logprob(ensemble[i])
         end
@@ -70,10 +70,12 @@ function pt_only_sample(logprob::Function,
             new_lp_cache[(ibeta - 1) * nwalkers + k] = lp_y
         end
     end
-    for i in 1:nwalkers
+
+    for i in 1:nwalkers*nbetas
         ensemble[i]=new_ensemble[i]
         lp_cache[i]=new_lp_cache[i]
     end
+    #(ensemble, lp_cache)
 end
 
 function exchange_prob(lp1::T, lp2::T, beta1::T, beta2::T)::T where {T <: AbstractFloat}
@@ -97,7 +99,7 @@ function swap_walkers(ensemble, lp_cache, beta_list::Array{T,1}, rng = Random.GL
         error("nwalkers % nbeta!=0")
     end
 
-    if length(lp_cache)==length(ensemble)
+    if length(lp_cache)!=length(ensemble)
         return
     end
 

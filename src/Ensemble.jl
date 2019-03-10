@@ -1,7 +1,7 @@
 module Ensemble
 
-include("utils.jl")
-const draw_z = utils.draw_z
+using ..Utils
+const draw_z = Utils.draw_z
 
 using Random
 
@@ -30,7 +30,7 @@ function sample(logprob::Function,
 
     lp_cached = length(lp_cache)==length(ensemble)
     if !lp_cached
-        resize!(lp_cache, length(ensemble))        
+        resize!(lp_cache, nwalkers)
         for i in 1:nwalkers
             lp_cache[i] = logprob(ensemble[i])
         end
