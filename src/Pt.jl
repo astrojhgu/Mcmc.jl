@@ -7,7 +7,7 @@ const draw_z=Utils.draw_z
 
 function pt_only_sample(logprob::Function, 
     ensemble::Array{Array{T,1},1}, 
-    lp_cache::Union{Missing,Array{T,1}}, 
+    lp_cache::Array{T,1}, 
     beta_list::Array{T,1},
     a::T, 
     rng = Random.GLOBAL_RNG) where 
@@ -38,9 +38,10 @@ function pt_only_sample(logprob::Function,
     zvec = map(x->map(x->draw_z(a, rng), 1:nwalkers), 1:nbetas)
 
 
-    lp_cached = !ismissing(lp_cache)
+    lp_cached = length(lp_cache)==length(ensemble)
     if !lp_cached
-        lp_cache = fill(zero(T), nwalkers * nbetas)
+        resize!(lp_cache, nwalkers*nbetas)
+        #lp_cache = fill(zero(T), nwalkers * nbetas)
         for i in 1:nwalkers * nbetas
             lp_cache[i] = logprob(ensemble[i])
         end
@@ -69,7 +70,12 @@ function pt_only_sample(logprob::Function,
             new_lp_cache[(ibeta - 1) * nwalkers + k] = lp_y
         end
     end
-    (new_ensemble, new_lp_cache)
+
+    for i in 1:nwalkers*nbetas
+        ensemble[i]=new_ensemble[i]
+        lp_cache[i]=new_lp_cache[i]
+    end
+    #(ensemble, lp_cache)
 end
 
 function exchange_prob(lp1::T, lp2::T, beta1::T, beta2::T)::T where {T <: AbstractFloat}
@@ -93,7 +99,7 @@ function swap_walkers(ensemble, lp_cache, beta_list::Array{T,1}, rng = Random.GL
         error("nwalkers % nbeta!=0")
     end
 
-    if ismissing(lp_cache)
+    if length(lp_cache)!=length(ensemble)
         return
     end
 

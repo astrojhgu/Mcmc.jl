@@ -7,7 +7,7 @@ using Random
 
 function sample(logprob::Function, 
     ensemble::Array{Array{T,1},1}, 
-    lp_cache::Union{Missing,Array{T,1}}, 
+    lp_cache::Array{T,1}, 
     a::T, 
     rng = Random.GLOBAL_RNG) where 
     {T <: AbstractFloat}
@@ -28,10 +28,9 @@ function sample(logprob::Function,
     zvec = map(x->draw_z(a, rng), 1:nwalkers)
 
 
-    lp_cached = !ismissing(lp_cache)
+    lp_cached = length(lp_cache)==length(ensemble)
     if !lp_cached
-        lp_cache = fill(zero(T), nwalkers)
-        
+        resize!(lp_cache, nwalkers)
         for i in 1:nwalkers
             lp_cache[i] = logprob(ensemble[i])
         end
@@ -55,7 +54,10 @@ function sample(logprob::Function,
             new_lp_cache[k] = lp_y
         end
     end
-    (new_ensemble, new_lp_cache)
+    for i in 1:nwalkers
+        ensemble[i]=new_ensemble[i]
+        lp_cache[i]=new_lp_cache[i]
+    end
 end
 
 end
