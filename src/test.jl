@@ -1,4 +1,8 @@
 include("Mcmc.jl")
+import Plots
+
+Plots.gr()
+
 
 using Random
 import SpecialFunctions
@@ -63,21 +67,19 @@ lp=[0.0]
 beta_list=map(x->2.0^(-x), 0:3)
 
 
-import Plots
-
-Plots.pyplot()
 
 hist=empty([], Array{Float64, 1})
 
 for i in 1:1000
-    #Mcmc.Pt.sample(logprob, ensemble, lp, beta_list, i%10==0, 0.5)
-    Mcmc.Ensemble.sample(logprob, ensemble, lp, 0.5)
+    Mcmc.Pt.sample(logprob, ensemble, lp, beta_list, i%10==0, 0.5)
+    #Mcmc.Ensemble.sample(logprob, ensemble, lp, 0.5)
     #push!(hist, ensemble[1])
 end
 
 
 for i in 1:30000
-    Mcmc.Ensemble.sample(logprob, ensemble, lp, 0.5)
+    Mcmc.Pt.sample(logprob, ensemble, lp, beta_list, i%10==0, 0.5)
+    #Mcmc.Ensemble.sample(logprob, ensemble, lp, 0.5)
     push!(hist, ensemble[1])
 end
 
