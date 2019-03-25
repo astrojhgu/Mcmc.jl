@@ -44,23 +44,21 @@ function logprob(x::Array{Float64, 1})::Float64
         -Inf64
     else
         logprob=0.0
-        for (e, r, i) in zip(energy, nrec, ninj)
+        sum(begin
             eff=a+(b-a)*phi((e-mu)/sigma)
-            logprob+=logbin(r, eff, i)
-        end
-        logprob
+            logbin(r, eff, i)
+        end for (e, r, i) in zip(energy, nrec, ninj))
     end
 end
 
-let 
-ensemble=empty([], Array{Float64,1})
-for i in 1:32
-    a=Random.rand()*0.1
-    b=Random.rand()*0.1+0.89
-    mu=Random.rand()*1.0+15
-    sigma=Random.rand()*3.0+10
-    push!(ensemble, [a,b,mu,sigma])
-end
+let
+ensemble=collect((begin
+a=Random.rand()*0.1
+b=Random.rand()*0.1+0.89
+mu=Random.rand()*1.0+15
+sigma=Random.rand()*3.0+10
+[a,b,mu,sigma]
+end) for i in 1:32)
 
 lp=[0.0]
 
@@ -77,13 +75,13 @@ for i in 1:1000
 end
 
 
-for i in 1:30000
+@time for i in 1:30000
     Mcmc.Pt.sample(logprob, ensemble, lp, beta_list, i%10==0, 0.5)
     #Mcmc.Ensemble.sample(logprob, ensemble, lp, 0.5)
     push!(hist, ensemble[1])
 end
 
 d=transpose(hcat(hist...))
-Plots.scatter(d[:,1], d[:,2], markersize=0.5,label="a")
+Plots.scatter(d[:,1], d[:,2], markersize=0.2,leg=false, dpi=600)
 Plots.savefig("a.png")
 end
