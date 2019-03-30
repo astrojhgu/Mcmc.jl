@@ -5,16 +5,16 @@ using Random
 
 const draw_z=Utils.draw_z
 
-function pt_only_sample(logprob::Function, 
+function pt_only_sample(logprob::Function,
     ensemble::AbstractArray{U,1},
     lp_cache::AbstractArray{T,1},
     beta_list::AbstractArray{T,1},
-    a::T, 
-    rng = Random.GLOBAL_RNG) where 
+    a::T,
+    rng = Random.GLOBAL_RNG) where
     {T <: AbstractFloat, U}
-    
+
     nbetas = length(beta_list)
-    
+
 
     nwalkers = length(ensemble) ÷ nbetas
 
@@ -25,7 +25,7 @@ function pt_only_sample(logprob::Function,
     if nbetas * nwalkers != length(ensemble)
         error("nbeta*nwalkers!=len(ensenble)")
     end
-    
+
     ndims = length(first(ensemble))
 
     half_nwalkers = nwalkers ÷ 2
@@ -65,7 +65,7 @@ function pt_only_sample(logprob::Function,
         beta = beta_list[firstindex(beta_list)+ibeta]
         delta_lp = lp_y - lp_last_y
         q = exp((ndims - one(T)) * log(z) + delta_lp * beta);
-        if r <= q 
+        if r <= q
             new_ensemble[firstindex(ensemble)+ibeta * nwalkers + k] = new_y
             new_lp_cache[firstindex(new_lp_cache)+ibeta * nwalkers + k] = lp_y
         end
@@ -92,7 +92,7 @@ function swap_element(x::A, i::I, j::I) where {A <: AbstractArray,I <: Integer}
 end
 
 
-function swap_walkers(ensemble, lp_cache, beta_list::Array{T,1}, rng = Random.GLOBAL_RNG) where {T <: AbstractFloat}
+function swap_walkers(ensemble, lp_cache, beta_list::AbstractArray{T,1}, rng = Random.GLOBAL_RNG) where {T <: AbstractFloat}
     nbeta = length(beta_list)
     nwalkers_per_beta = length(ensemble) ÷ nbeta
     if nwalkers_per_beta * nbeta != length(ensemble)
@@ -106,7 +106,7 @@ function swap_walkers(ensemble, lp_cache, beta_list::Array{T,1}, rng = Random.GL
     for i in nbeta-1:-1:1
         beta1 = beta_list[firstindex(beta_list)+i]
         beta2 = beta_list[firstindex(beta_list)+i - 1]
-        if beta1 >= beta2 
+        if beta1 >= beta2
             error("Error, beta list must be in desc order")
         end
         jvec = Random.shuffle(rng, [0:nwalkers_per_beta-1; ])
@@ -121,17 +121,17 @@ function swap_walkers(ensemble, lp_cache, beta_list::Array{T,1}, rng = Random.GL
                 swap_element(ensemble, firstindex(ensemble)+i * nwalkers_per_beta + j1, firstindex(ensemble)+(i - 1) * nwalkers_per_beta + j2)
                 swap_element(lp_cache, firstindex(ensemble)+i * nwalkers_per_beta + j1, firstindex(ensemble)+(i - 1) * nwalkers_per_beta + j2)
             end
-        end        
+        end
     end
 end
 
-function sample(logprob::Function, 
-    ensemble::Array{Array{T,1},1}, 
-    lp_cache::Array{T,1}, 
-    beta_list::Array{T,1}, 
-    perform_swap::Bool, 
-    a::T, 
-    rng = Random.GLOBAL_RNG) where {T <: AbstractFloat}
+function sample(logprob::Function,
+    ensemble::AbstractArray{U,1},
+    lp_cache::AbstractArray{T,1},
+    beta_list::AbstractArray{T,1},
+    perform_swap::Bool,
+    a::T,
+    rng = Random.GLOBAL_RNG) where {T <: AbstractFloat,U}
     if perform_swap
         swap_walkers(ensemble, lp_cache, beta_list, rng)
     end
