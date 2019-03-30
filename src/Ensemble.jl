@@ -5,11 +5,11 @@ const draw_z = Utils.draw_z
 
 using Random
 
-function sample(logprob::Function, 
+function sample(logprob::Function,
     ensemble::AbstractArray{U,1},
     lp_cache::AbstractArray{T,1},
-    a::T, 
-    rng = Random.GLOBAL_RNG) where 
+    a::T,
+    rng = Random.GLOBAL_RNG) where
     {T <: AbstractFloat, U}
     nwalkers = length(ensemble)
 
@@ -49,13 +49,17 @@ function sample(logprob::Function,
         new_y = ensemble[firstindex(ensemble)+k] * z + ensemble[firstindex(ensemble)+walker_group[1+ni][1+j]] * (one(T) - z)
         lp_y = logprob(new_y)
         q = exp((ndims - one(T)) * log(z) + lp_y - lp_last_y);
-        if r <= q 
+        if r <= q
             new_ensemble[firstindex(new_ensemble)+k] = new_y
             new_lp_cache[firstindex(new_lp_cache)+k] = lp_y
         end
     end
+
     for i in eachindex(ensemble)
         ensemble[i]=new_ensemble[i]
+    end
+
+    for i in eachindex(lp_cache)
         lp_cache[i]=new_lp_cache[i]
     end
 end
