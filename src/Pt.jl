@@ -73,8 +73,12 @@ function pt_only_sample(logprob::Function,
 
     for i in eachindex(ensemble)
         ensemble[i]=new_ensemble[i]
+    end
+
+    for i in eachindex(lp_cache)
         lp_cache[i]=new_lp_cache[i]
     end
+
     #(ensemble, lp_cache)
 end
 
