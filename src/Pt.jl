@@ -123,7 +123,7 @@ function swap_walkers(ensemble, lp_cache, beta_list::AbstractArray{T,1}, rng = R
             ep = exchange_prob(lp1, lp2, beta1, beta2)
             if r < ep
                 swap_element(ensemble, firstindex(ensemble)+i * nwalkers_per_beta + j1, firstindex(ensemble)+(i - 1) * nwalkers_per_beta + j2)
-                swap_element(lp_cache, firstindex(ensemble)+i * nwalkers_per_beta + j1, firstindex(ensemble)+(i - 1) * nwalkers_per_beta + j2)
+                swap_element(lp_cache, firstindex(lp_cache)+i * nwalkers_per_beta + j1, firstindex(lp_cache)+(i - 1) * nwalkers_per_beta + j2)
             end
         end
     end
